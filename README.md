@@ -100,7 +100,7 @@ Provides end-to-end monitoring for host telemetry (including SoC temperature and
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/<your-username>/rpi-observability-stack.git
+git clone https://github.com/mypsiblades/rpi-observability-stack.git
 cd rpi-observability-stack
 ```
 
