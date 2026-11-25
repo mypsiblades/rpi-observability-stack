@@ -1,0 +1,16 @@
+# Environment and secrets
+.env
+*.token
+telegram_token
+data/
+
+# Docker volumes / persistence local data
+prom-data/
+grafana-data/
+kuma-data/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

@@ -1,0 +1,78 @@
+groups:
+  - name: raspberrypi_hardware_alerts
+    rules:
+      - alert: HostTargetDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Target {{ $labels.instance }} is DOWN"
+          description: "Scrape target {{ $labels.job }} ({{ $labels.instance }}) has been unreachable for more than 1 minute."
+
+      - alert: RPiHighCpuTemperature
+        expr: node_thermal_zone_temp{type="cpu-thermal"} > 75
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Raspberry Pi CPU Temperature High: {{ $value }}°C"
+          description: "CPU temperature on {{ $labels.instance }} exceeded 75°C for more than 2 minutes."
+
+      - alert: RPiCriticalCpuTemperature
+        expr: node_thermal_zone_temp{type="cpu-thermal"} > 82
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "CRITICAL: Raspberry Pi CPU Thermal Throttling imminent: {{ $value }}°C"
+          description: "CPU temperature on {{ $labels.instance }} is above 82°C. Throttling active!"
+
+      - alert: HostHighCpuLoad
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host CPU Usage high: {{ $value | printf \"%.1f\" }}%"
+          description: "CPU usage on {{ $labels.instance }} is over 85% for more than 5 minutes."
+
+      - alert: HostLowMemory
+        expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) * 100 < 10
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host Memory Low: {{ $value | printf \"%.1f\" }}% remaining"
+          description: "Available RAM on {{ $labels.instance }} dropped below 10%."
+
+      - alert: HostLowDiskSpace
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Host Root Disk Space Low: {{ $value | printf \"%.1f\" }}% remaining"
+          description: "Root partition free space on {{ $labels.instance }} is under 15%."
+
+  - name: blackbox_service_alerts
+    rules:
+      - alert: ServiceHttpProbeFailed
+        expr: probe_success == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "HTTP Service DOWN: {{ $labels.instance }}"
+          description: "Blackbox probe failed for endpoint {{ $labels.instance }}."
+
+  - name: docker_container_alerts
+    rules:
+      - alert: ContainerKilledOrRestarted
+        expr: rate(container_last_seen[1m]) < 0 or increase(container_start_time_seconds[5m]) > 3
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Container restarting frequently: {{ $labels.name }}"
+          description: "Docker container {{ $labels.name }} has restarted more than 3 times in 5 minutes."

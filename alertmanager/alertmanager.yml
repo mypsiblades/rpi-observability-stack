@@ -1,0 +1,26 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'instance', 'severity']
+  group_wait: 10s
+  group_interval: 30s
+  repeat_interval: 3h
+  receiver: 'telegram-notifications'
+
+receivers:
+  - name: 'telegram-notifications'
+    telegram_configs:
+      - bot_token_file: '/etc/alertmanager/telegram_token'
+        chat_id: 5433837561
+        send_resolved: true
+        parse_mode: 'HTML'
+        message: |
+          <b>{{ if eq .Status "firing" }}🔥 ALERT [{{ .CommonLabels.severity | toUpper }}]{{ else }}✅ RESOLVED{{ end }}</b>
+          <b>Rule:</b> {{ .CommonLabels.alertname }}
+          <b>Target:</b> {{ .CommonLabels.instance }}
+          {{ range .Alerts }}
+          <b>Summary:</b> {{ .Annotations.summary }}
+          <b>Details:</b> {{ .Annotations.description }}
+          <i>Time: {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}</i>
+          {{ end }}
