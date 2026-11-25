@@ -129,7 +129,7 @@ docker compose up -d
 * **Grafana:** `http://<PI_IP>:3001` (Default login: `admin` / `admin`)
 * **Prometheus:** `http://<PI_IP>:9090`
 * **Alertmanager:** `http://<PI_IP>:9093`
-* **cAdvisor:** `http://<PI_IP>:8080`
+* **cAdvisor:** `http://<PI_IP>:8085`
 * **Uptime Kuma:** `http://<PI_IP>:3002`
 
 ---
